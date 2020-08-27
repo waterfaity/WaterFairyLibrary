@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <style name="AudioPlaySeekBarStyle" parent="@android:style/Widget.SeekBar">
+        <item name="android:maxHeight">3dip</item>
+        <item name="android:minHeight">3dip</item>
+        <item name="android:thumb">@drawable/bottom_thumb_normal</item>
+        <item name="android:progressDrawable">@drawable/audio_bottom_seekbar_bg</item>
+    </style>
+
+</resources>

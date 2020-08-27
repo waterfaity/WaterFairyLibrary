@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 白色前景 -->
+
+    <!-- 透明阴影 -->
+    <item android:gravity="center">
+        <shape android:shape="oval">
+            <size
+                android:width="16dp"
+                android:height="16dp" />
+            <solid android:color="@color/main_color_1" />
+        </shape>
+    </item>
+
+    <item
+        android:bottom="3dp"
+        android:gravity="center"
+        android:left="3dp"
+        android:right="3dp"
+        android:top="3dp">
+        <shape android:shape="oval">
+            <size
+                android:width="10dp"
+                android:height="10dp" />
+            <solid android:color="@color/main_color" />
+        </shape>
+    </item>
+</layer-list>

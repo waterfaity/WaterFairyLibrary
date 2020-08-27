@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rel_play"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:clickable="true">
+
+
+    <com.waterfairy.media.audio.play.AbAudioPlayButtonView
+        android:id="@+id/bt_play"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        app:res_pause="@drawable/icon_pause_2"
+        app:res_play="@drawable/icon_play_2" />
+
+    <ImageView
+        android:id="@+id/iv_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/bg_style_round_white_17dp"
+        android:clickable="true"
+        android:padding="10dp"
+        android:src="@drawable/bottom_audio_loading"
+        android:tint="@color/main_color"
+        android:visibility="gone" />
+
+    <SeekBar
+        android:id="@+id/progress_bar"
+        style="@style/AudioPlaySeekBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/bt_play"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="12dp"
+        android:layout_toLeftOf="@+id/time_total"
+        android:layout_toRightOf="@+id/time_current"
+        android:max="100"
+        android:progress="10" />
+
+</RelativeLayout>
+

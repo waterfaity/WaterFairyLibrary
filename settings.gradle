@@ -1,0 +1,15 @@
+include ':app'
+rootProject.name = "WaterFairyLibrary"
+
+include ':libraryShare'
+include ':libraryUpdateVersion'
+include ':libraryLocation'
+include ':libraryVideoPlay'
+include ':libraryAudioRecord'
+include ':libraryDateTimePicker'
+include ':libraryAudioPlay'
+include ':librarymediacache'
+include ':libraryDownloader'
+include ':libraryExoPlayer'
+include ':libraryRegionSelect'
+include ':libraryWaterfairy'

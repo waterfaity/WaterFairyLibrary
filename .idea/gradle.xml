@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="testRunner" value="PLATFORM" />
+        <option name="distributionType" value="DEFAULT_WRAPPED" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../software/gradle-5.1.1" />
+        <option name="gradleJvm" value="JDK" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/libraryAudioPlay" />
+            <option value="$PROJECT_DIR$/libraryAudioRecord" />
+            <option value="$PROJECT_DIR$/libraryDateTimePicker" />
+            <option value="$PROJECT_DIR$/libraryDownloader" />
+            <option value="$PROJECT_DIR$/libraryExoPlayer" />
+            <option value="$PROJECT_DIR$/libraryLocation" />
+            <option value="$PROJECT_DIR$/libraryRegionSelect" />
+            <option value="$PROJECT_DIR$/libraryShare" />
+            <option value="$PROJECT_DIR$/libraryUpdateVersion" />
+            <option value="$PROJECT_DIR$/libraryVideoPlay" />
+            <option value="$PROJECT_DIR$/libraryWaterfairy" />
+            <option value="$PROJECT_DIR$/librarymediacache" />
+          </set>
+        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
