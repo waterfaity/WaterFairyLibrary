@@ -1,6 +1,7 @@
 package com.waterfairy.librarypickerview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,7 +21,12 @@ import java.util.List;
  * info:
  */
 public class PickerView extends View {
+    public static final int STYLE_CENTER = 0;
+    public static final int STYLE_LEFT = 1;
+    public static final int STYLE_RIGHT = 2;
     private static final String TAG = "pickerView";
+    //展示样式  (0中间 1左侧 2右侧)
+    private int showStyle;
     private List<String> dataList;
     //当前位置
     private int currentPos = 0;
@@ -49,10 +55,13 @@ public class PickerView extends View {
     private int roundHeight;
     //文本 差值
     private int dTextSize;
+    //偏移 差值
+    private int dTransX;
 
 
     private int scrollY;
 
+    private Rect tempRect = new Rect();
 
     //画笔
     private Paint paint;
@@ -67,13 +76,34 @@ public class PickerView extends View {
 
     public PickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+
+        if (attrs != null) {
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PickerView);
+
+            firstDataTextSize = typedArray.getDimensionPixelSize(R.styleable.PickerView_firstDataTextSize, firstDataTextSize);
+            centerDataTextSize = typedArray.getDimensionPixelSize(R.styleable.PickerView_centerDataTextSize, centerDataTextSize);
+
+            firstDataTextColor = typedArray.getColor(R.styleable.PickerView_firstDataTextColor, firstDataTextColor);
+            centerDataTextColor = typedArray.getColor(R.styleable.PickerView_centerDataTextColor, centerDataTextColor);
+
+
+            firstDataTransX = typedArray.getDimensionPixelSize(R.styleable.PickerView_firstDataTransX, firstDataTransX);
+            centerDataTransX = typedArray.getDimensionPixelSize(R.styleable.PickerView_centerDataTransX, centerDataTransX);
+
+            showStyle = typedArray.getInt(R.styleable.PickerView_showStyle, STYLE_CENTER);
+            showDataSize = typedArray.getInt(R.styleable.PickerView_showDataSize, showDataSize);
+            itemHeight = typedArray.getDimensionPixelSize(R.styleable.PickerView_itemHeight, itemHeight);
+
+            typedArray.recycle();
+        }
+
         paint = new Paint();
         paint.setAntiAlias(true);
         dataList = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
             dataList.add("数据" + i);
         }
-        scrollY = (int) (((showDataSize + 1) / 2 + 0.5F) * itemHeight);
 
         gestureFlingTool = new GestureFlingTool();
         gestureFlingTool.setOnFlingListener(new GestureFlingTool.OnFlingListener() {
@@ -97,7 +127,6 @@ public class PickerView extends View {
         return new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                Log.i(TAG, "onFling: " + velocityY);
                 gestureFlingTool.startFling(e1, e2, velocityX, velocityY);
                 return true;
             }
@@ -113,6 +142,7 @@ public class PickerView extends View {
         for (int i = 0; i < dataList.size(); i++) {
             calcTextParams(canvas, i);
         }
+        paint.setColor(Color.RED);
         canvas.drawLine(0, getHeight() >> 1, getWidth(), getHeight() >> 1, paint);
     }
 
@@ -141,6 +171,8 @@ public class PickerView extends View {
         centerY = (getHeight() >> 1);
         roundHeight = (showDataSize >> 1) * itemHeight;
         dTextSize = centerDataTextSize - firstDataTextSize;
+        scrollY = (int) ((getHeight() >> 1) + 0.5F * itemHeight);
+        dTransX = centerDataTransX - firstDataTransX;
     }
 
     @Override
@@ -179,18 +211,23 @@ public class PickerView extends View {
         }
 
         String text = dataList.get(pos);
-        Rect rect = new Rect();
         paint.setTextSize(currentTextSize);
-        paint.getTextBounds(text, 0, text.length(), rect);
+        paint.getTextBounds(text, 0, text.length(), tempRect);
         paint.setColor(currentColor);
 
         //当前y
-        int currentY = y - ((itemHeight - rect.height()) >> 1) + rect.bottom;
+        int currentY = y - ((itemHeight - tempRect.height()) >> 1) - tempRect.bottom;
 
         //当前x
-        int currentX = 0;
+        int currentX = (int) (firstDataTransX + dTransX * ratio);
 
         canvas.drawText(text, currentX, currentY, paint);
+
+        tempRect.bottom += currentY;
+        tempRect.top += currentY;
+        paint.setColor(Color.parseColor("#22000000"));
+        canvas.drawRect(tempRect, paint);
+        canvas.drawLine(0, y, getWidth(), y, paint);
 
     }
 

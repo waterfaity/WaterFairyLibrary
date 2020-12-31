@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="PickerView">
-        <!--        启动滑动功能-->
-        <attr name="flyingEnable" format="boolean" />
+
         <!--        展示数据数量-->
         <attr name="showDataSize" format="integer" />
         <!--        第一个数据偏移量-->
         <attr name="firstDataTransX" format="dimension" />
         <!--        中间数据偏移量-->
         <attr name="centerDataTransX" format="dimension" />
-        <!--        第一个数据透明度-->
-        <attr name="firstDataAlpha" format="float" />
-        <!--        中间数据透明度-->
-        <attr name="centerDataAlpha" format="float" />
+        <!--        第一个数据颜色-->
+        <attr name="firstDataTextColor" format="color" />
+        <!--        中间数据颜色-->
+        <attr name="centerDataTextColor" format="color" />
         <!--        第一个数据字体大小-->
         <attr name="firstDataTextSize" format="dimension" />
         <!--        中间数据字体大小-->
@@ -26,7 +25,7 @@
         <!--        是否可以循环-->
         <attr name="loopAble" format="boolean" />
         <!--        高度间距-->
-        <attr name="dividerHeight" format="dimension" />
+        <attr name="itemHeight" format="dimension" />
 
     </declare-styleable>
 
