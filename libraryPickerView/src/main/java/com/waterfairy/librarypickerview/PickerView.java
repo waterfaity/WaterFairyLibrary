@@ -129,7 +129,7 @@ public class PickerView extends View {
 
         int currentStartY = (currentStartY = currentY % totalHeight) + (currentStartY < 0 ? totalHeight : 0);
 
-        drawText(canvas, pos, 0, currentStartY, centerDataTextSize);
+        drawText(canvas, pos, currentStartY);
     }
 
     public void initData() {
@@ -149,11 +149,9 @@ public class PickerView extends View {
      *
      * @param canvas
      * @param pos
-     * @param x
      * @param y
-     * @param textSize
      */
-    private void drawText(Canvas canvas, int pos, int x, int y, float textSize) {
+    private void drawText(Canvas canvas, int pos, int y) {
 
         //距离中心位置 差距
         int dHeight = y - (itemHeight >> 1) - centerY;
@@ -174,22 +172,24 @@ public class PickerView extends View {
 
         String text = dataList.get(pos);
         Rect rect = new Rect();
-        paint.getTextBounds(text, 0, text.length(), rect);
-
-        paint.setColor(currentColor);
         paint.setTextSize(currentTextSize);
+        paint.getTextBounds(text, 0, text.length(), rect);
+        paint.setColor(currentColor);
 
         int dy = ((itemHeight - rect.height()) >> 1) + rect.bottom;
 
+        canvas.drawText(text, 0, y - dy, paint);
 
         canvas.drawLine(0, y, getWidth(), y, paint);
-
         paint.setColor(Color.parseColor("#33121212"));
-        rect.top += y-itemHeight-dy;
-        rect.bottom += y-itemHeight-dy;
+        rect.top += y - dy;
+        rect.bottom += y - dy;
         canvas.drawRect(rect, paint);
 
-        canvas.drawText(text, x, rect.bottom, paint);
+        if (pos == 0) {
+            Log.i(TAG, "drawText: " + currentTextSize);
+        }
+
     }
 
     private int transColor(int colorFrom, int colorEnd, float ratio) {
