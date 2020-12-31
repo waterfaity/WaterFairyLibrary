@@ -24,8 +24,6 @@ public class PickerView extends View {
     private List<String> dataList;
     //当前位置
     private int currentPos = 0;
-    //飞滚开关
-    private boolean flyingEnable;
     //展示的数据个数
     private int showDataSize = 5;
     //偏移量
@@ -127,9 +125,16 @@ public class PickerView extends View {
         int currentY = pos * itemHeight + scrollY;
         int totalHeight = dataList.size() * itemHeight;
 
+        //求余  为负? otalHeight  :  0;
         int currentStartY = (currentStartY = currentY % totalHeight) + (currentStartY < 0 ? totalHeight : 0);
 
+
+        //超出边界不绘制
+        if (currentStartY < 0 || currentStartY - itemHeight - getHeight() > 0) return;
+
+        //绘制text
         drawText(canvas, pos, currentStartY);
+
     }
 
     public void initData() {
@@ -150,8 +155,10 @@ public class PickerView extends View {
      * @param canvas
      * @param pos
      * @param y
+     * @return
      */
     private void drawText(Canvas canvas, int pos, int y) {
+
 
         //距离中心位置 差距
         int dHeight = y - (itemHeight >> 1) - centerY;
@@ -165,6 +172,7 @@ public class PickerView extends View {
         //计算此时的文本大小
         float currentTextSize = firstDataTextSize + ratio * dTextSize;
 
+        //计算颜色
         int currentColor = firstDataTextColor;
         if (firstDataTextColor != centerDataTextColor) {
             currentColor = transColor(firstDataTextColor, centerDataTextColor, ratio);
@@ -176,19 +184,13 @@ public class PickerView extends View {
         paint.getTextBounds(text, 0, text.length(), rect);
         paint.setColor(currentColor);
 
-        int dy = ((itemHeight - rect.height()) >> 1) + rect.bottom;
+        //当前y
+        int currentY = y - ((itemHeight - rect.height()) >> 1) + rect.bottom;
 
-        canvas.drawText(text, 0, y - dy, paint);
+        //当前x
+        int currentX = 0;
 
-        canvas.drawLine(0, y, getWidth(), y, paint);
-        paint.setColor(Color.parseColor("#33121212"));
-        rect.top += y - dy;
-        rect.bottom += y - dy;
-        canvas.drawRect(rect, paint);
-
-        if (pos == 0) {
-            Log.i(TAG, "drawText: " + currentTextSize);
-        }
+        canvas.drawText(text, currentX, currentY, paint);
 
     }
 
