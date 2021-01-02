@@ -16,6 +16,10 @@ public class GestureFlingTool {
 
     private MyValueAnimator valueAnimator;
 
+    public GestureFlingTool(OnFlingListener onFlingListener) {
+        this.onFlingListener = onFlingListener;
+    }
+
     public void setOnFlingListener(OnFlingListener onFlingListener) {
         this.onFlingListener = onFlingListener;
     }
@@ -122,13 +126,14 @@ public class GestureFlingTool {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     if (!work) return;
-                    if (onFlingListener != null) onFlingListener.onFlingEnd();
+                    onFlingListener.onFlingEnd(currentEventX, currentEventY);
                 }
 
                 @Override
                 public void onAnimationCancel(Animator animation) {
                     if (!work) return;
-                    if (onFlingListener != null) onFlingListener.onFlingEnd();
+                    if (onFlingListener != null)
+                        onFlingListener.onFlingEnd(currentEventX, currentEventY);
                 }
 
                 @Override
@@ -150,6 +155,6 @@ public class GestureFlingTool {
     public interface OnFlingListener {
         void onFling(int x, int y, int dX, int dY);
 
-        void onFlingEnd();
+        void onFlingEnd(float x, float y);
     }
 }
