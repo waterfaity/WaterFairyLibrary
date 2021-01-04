@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -42,13 +43,25 @@ public class PickerView extends View {
     private int firstDataTextColor = Color.CYAN;
     private int centerDataTextColor = Color.BLUE;
 
+    //分割线
+    private int diverLineWidth;
+    private int diverLineHeight;
+    private int diverLineRadius;
+    private int diverLineColor;
+    //分割线1
+    private RectF diverLineY1;
+    //分割线2
+    private RectF diverLineY2;
+
     //第一个数据中心 y
     private int itemHeight = 50;
+    private int halfItemHeight = itemHeight >> 1;
     private int allHeight = 50;
     //中心y
+    private int centerX;
     private int centerY;
     //过度距离    (0 -> roundHeight -> 0)
-    private int roundHeight;
+    private int chaneHeightRange;
     //文本 差值
     private int dTextSize;
     //偏移 差值
@@ -59,7 +72,7 @@ public class PickerView extends View {
     private int oriScrollY;
     //滚动x
     private int scrollY;
-    //中间计算文本宽高数值
+    //中间数据: 计算文本宽高数值
     private final Rect tempRect = new Rect();
     //按下y坐标
     private float downY;
@@ -99,6 +112,11 @@ public class PickerView extends View {
             showStyle = typedArray.getInt(R.styleable.PickerView_showStyle, STYLE_CENTER);
             showDataSize = typedArray.getInt(R.styleable.PickerView_showDataSize, showDataSize);
             itemHeight = typedArray.getDimensionPixelSize(R.styleable.PickerView_itemHeight, itemHeight);
+
+            diverLineWidth = typedArray.getDimensionPixelSize(R.styleable.PickerView_diverLineWidth, diverLineWidth);
+            diverLineHeight = typedArray.getDimensionPixelSize(R.styleable.PickerView_diverLineHeight, diverLineHeight);
+            diverLineRadius = typedArray.getDimensionPixelSize(R.styleable.PickerView_diverLineRadius, diverLineRadius);
+            diverLineColor = typedArray.getColor(R.styleable.PickerView_diverLineColor, diverLineColor);
 
             typedArray.recycle();
         }
@@ -157,12 +175,19 @@ public class PickerView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        //计算相对view的y轴坐标
+        //分割线
 
+        if (diverLineY1 != null) {
+            paint.setColor(diverLineColor);
+            canvas.drawRoundRect(diverLineY1, diverLineRadius, diverLineRadius, paint);
+            canvas.drawRoundRect(diverLineY2, diverLineRadius, diverLineRadius, paint);
+        }
+
+        //计算相对view的y轴坐标
         for (int i = 0; i < dataList.size(); i++) {
             calcTextParams(canvas, i);
-
         }
+
         //中心线
         paint.setColor(Color.RED);
         canvas.drawLine(0, getHeight() >> 1, getWidth(), getHeight() >> 1, paint);
@@ -189,15 +214,26 @@ public class PickerView extends View {
 
     private void initData() {
         centerY = (getHeight() >> 1);
-        roundHeight = (showDataSize >> 1) * itemHeight;
+        centerX = (getWidth() >> 1);
+        halfItemHeight = itemHeight >> 1;
+        allHeight = dataList.size() * itemHeight;
+        chaneHeightRange = (showDataSize >> 1) * itemHeight;
         dTextSize = centerDataTextSize - firstDataTextSize;
         scrollY = oriScrollY = (int) ((getHeight() >> 1) + 0.5F * itemHeight);
-        Log.i(TAG, "initData: oriScrollY:" + oriScrollY);
         dTransX = centerDataTransX - firstDataTransX;
+        Log.i(TAG, "initData: oriScrollY:" + oriScrollY);
+
         if (showStyle == STYLE_CENTER) {
             paint.setTextAlign(Paint.Align.CENTER);
+            if (diverLineWidth != 0 && diverLineHeight != 0) {
+
+                float halfLineWidth = diverLineWidth >> 1;
+                float halfLineHeight = diverLineHeight >> 1;
+                diverLineY1 = new RectF(centerX - halfLineWidth, centerY - halfLineHeight - halfItemHeight, centerX + halfLineWidth, centerY + halfLineHeight - halfItemHeight);
+                diverLineY2 = new RectF(diverLineY1.left, diverLineY1.top + itemHeight, diverLineY1.right, diverLineY1.bottom + itemHeight);
+            }
         }
-        allHeight = dataList.size() * itemHeight;
+
     }
 
     @Override
@@ -218,13 +254,13 @@ public class PickerView extends View {
     private void drawText(Canvas canvas, int pos, int y) {
 
         //距离中心位置 差距
-        int dHeight = y - (itemHeight >> 1) - centerY;
+        int dHeight = y - halfItemHeight - centerY;
 
         //在 界限之外的处理为在界限上
-        if (dHeight < -roundHeight || dHeight > roundHeight) dHeight = roundHeight;
+        if (dHeight < -chaneHeightRange || dHeight > chaneHeightRange) dHeight = chaneHeightRange;
 
         //计算差距的比例
-        float ratio = 1 - Math.abs(dHeight) / (float) roundHeight;
+        float ratio = 1 - Math.abs(dHeight) / (float) chaneHeightRange;
 
         //计算此时的文本大小
         float currentTextSize = firstDataTextSize + ratio * dTextSize;
@@ -304,14 +340,17 @@ public class PickerView extends View {
         return true;
     }
 
+    /**
+     * 触摸抬起
+     *
+     * @param touchY
+     */
     private void onUp(float touchY) {
         scrollY += (touchY - downY);
 
         float absHeight = ((scrollY - centerY) % itemHeight + itemHeight) % itemHeight;
 
         Log.i(TAG, "onUp:  条目高度:" + ((int) itemHeight) + "\tscrollY:" + scrollY + "\t\t相对高度:" + ((int) absHeight));
-
-        int halfItemHeight = itemHeight >> 1;
 
         float dY = absHeight - halfItemHeight;
 
@@ -321,6 +360,8 @@ public class PickerView extends View {
     }
 
     /**
+     * 触摸移动中
+     *
      * @param touchY
      */
     private void onMove(float touchY) {
@@ -330,6 +371,9 @@ public class PickerView extends View {
         invalidate();
     }
 
+    /**
+     * 选择监听
+     */
     public interface OnPickListener {
         void onPick(int pos);
     }

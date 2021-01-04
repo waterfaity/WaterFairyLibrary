@@ -27,6 +27,14 @@
         <!--        高度间距-->
         <attr name="itemHeight" format="dimension" />
 
+        <!--        分割线高度-->
+        <attr name="diverLineWidth" format="dimension" />
+        <attr name="diverLineHeight" format="dimension" />
+        <!--        分割线颜色-->
+        <attr name="diverLineColor" format="color" />
+        <!--        分割线半径-->
+        <attr name="diverLineRadius" format="dimension" />
+
     </declare-styleable>
 
 </resources>

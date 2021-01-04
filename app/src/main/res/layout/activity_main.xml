@@ -3,24 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:orientation="vertical"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
+
     <Button
         android:layout_width="match_parent"
-        android:layout_height="90dp"/>
+        android:layout_height="90dp" />
 
 
     <com.waterfairy.librarypickerview.PickerView
         android:layout_width="match_parent"
         android:layout_height="326dp"
         android:layout_gravity="center"
+        app:centerDataTextColor="#999912"
         app:centerDataTextSize="40dp"
+        app:diverLineColor="#991299"
+        app:diverLineHeight="6dp"
+        app:diverLineRadius="5dp"
+        app:diverLineWidth="80dp"
+        app:firstDataTextColor="#129999"
         app:firstDataTextSize="20dp"
         app:itemHeight="50dp"
         app:loopAble="true"
         app:showDataSize="4"
-        app:showStyle="LEFT" />
+        app:showStyle="CENTER" />
 
 
 </LinearLayout>
