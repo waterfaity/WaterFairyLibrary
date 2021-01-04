@@ -172,46 +172,14 @@ public class PickerView extends View {
 
 
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        //分割线
-
-        if (diverLineY1 != null) {
-            paint.setColor(diverLineColor);
-            canvas.drawRoundRect(diverLineY1, diverLineRadius, diverLineRadius, paint);
-            canvas.drawRoundRect(diverLineY2, diverLineRadius, diverLineRadius, paint);
-        }
-
-        //计算相对view的y轴坐标
-        for (int i = 0; i < dataList.size(); i++) {
-            calcTextParams(canvas, i);
-        }
-
-        //中心线
-        paint.setColor(Color.RED);
-        canvas.drawLine(0, getHeight() >> 1, getWidth(), getHeight() >> 1, paint);
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+        initData();
     }
-
 
     /**
-     * 计算在指定位置的 文本状态
+     * 初始化数据
      */
-    private void calcTextParams(Canvas canvas, int pos) {
-
-        int currentY = pos * itemHeight + scrollY;
-        int totalHeight = dataList.size() * itemHeight;
-
-        //求余  为负? otalHeight  :  0;
-        int currentStartY = (currentStartY = currentY % totalHeight) + (currentStartY < 0 ? totalHeight : 0);
-
-        //超出边界不绘制
-        if (currentStartY < 0 || currentStartY - itemHeight - getHeight() > 0) return;
-
-        //绘制text
-        drawText(canvas, pos, currentStartY);
-    }
-
     private void initData() {
         centerY = (getHeight() >> 1);
         centerX = (getWidth() >> 1);
@@ -237,11 +205,93 @@ public class PickerView extends View {
     }
 
     @Override
-    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
-        initData();
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            gestureFlingTool.stop();
+            animEndTool.stop();
+        }
+        if (detector.onTouchEvent(event)) return true;
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            downY = event.getY();
+        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+            onMove(event.getY());
+        } else if (event.getAction() == MotionEvent.ACTION_UP) {
+            onUp(event.getY());
+        }
+        return true;
     }
 
+
+    /**
+     * 触摸移动中
+     *
+     * @param touchY
+     */
+    private void onMove(float touchY) {
+        //刷新
+        scrollY += (touchY - downY);
+        downY = touchY;
+        invalidate();
+    }
+
+
+    /**
+     * 触摸抬起
+     *
+     * @param touchY
+     */
+    private void onUp(float touchY) {
+        scrollY += (touchY - downY);
+
+        float absHeight = ((scrollY - centerY) % itemHeight + itemHeight) % itemHeight;
+
+        float dY = absHeight - halfItemHeight;
+
+        float posY = touchY - dY;
+
+        animEndTool.startAnimEnd(touchY, posY);
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        //计算相对view的y轴坐标
+        for (int i = 0; i < dataList.size(); i++) {
+            calcTextParams(canvas, i);
+        }
+
+        //分割线
+
+        if (diverLineY1 != null) {
+            paint.setColor(diverLineColor);
+            canvas.drawRoundRect(diverLineY1, diverLineRadius, diverLineRadius, paint);
+            canvas.drawRoundRect(diverLineY2, diverLineRadius, diverLineRadius, paint);
+        }
+
+        //中心线
+        paint.setColor(Color.RED);
+        canvas.drawLine(0, getHeight() >> 1, getWidth(), getHeight() >> 1, paint);
+    }
+
+
+    /**
+     * 计算在指定位置的 文本状态
+     */
+    private void calcTextParams(Canvas canvas, int pos) {
+
+        int currentY = pos * itemHeight + scrollY;
+        int totalHeight = dataList.size() * itemHeight;
+
+        //求余  为负? otalHeight  :  0;
+        int currentStartY = (currentStartY = currentY % totalHeight) + (currentStartY < 0 ? totalHeight : 0);
+
+        //超出边界不绘制
+        if (currentStartY < 0 || currentStartY - itemHeight - getHeight() > 0) return;
+
+        //绘制text
+        drawText(canvas, pos, currentStartY);
+    }
 
     /**
      * 绘制文本
@@ -275,6 +325,8 @@ public class PickerView extends View {
         paint.setTextSize(currentTextSize);
         paint.getTextBounds(text, 0, text.length(), tempRect);
         paint.setColor(currentColor);
+        if (pos == 0)
+            Log.i(TAG, "drawText: " + currentTextSize + "\t" + tempRect.width());
 
         //当前y
         int currentY = y - ((itemHeight - tempRect.height()) >> 1) - tempRect.bottom;
@@ -301,6 +353,7 @@ public class PickerView extends View {
         canvas.drawLine(0, y, getWidth(), y, paint);
     }
 
+
     /**
      * 颜色过度
      *
@@ -323,53 +376,6 @@ public class PickerView extends View {
         return Color.argb((int) (alpha + dAlpha * ratio), (int) (red + dRed * ratio), (int) (green + dGreen * ratio), (int) (blue + dBlue * ratio));
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            gestureFlingTool.stop();
-            animEndTool.stop();
-        }
-        if (detector.onTouchEvent(event)) return true;
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-            downY = event.getY();
-        } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            onMove(event.getY());
-        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-            onUp(event.getY());
-        }
-        return true;
-    }
-
-    /**
-     * 触摸抬起
-     *
-     * @param touchY
-     */
-    private void onUp(float touchY) {
-        scrollY += (touchY - downY);
-
-        float absHeight = ((scrollY - centerY) % itemHeight + itemHeight) % itemHeight;
-
-        Log.i(TAG, "onUp:  条目高度:" + ((int) itemHeight) + "\tscrollY:" + scrollY + "\t\t相对高度:" + ((int) absHeight));
-
-        float dY = absHeight - halfItemHeight;
-
-        float posY = touchY - dY;
-        Log.i(TAG, "onUp: from:" + ((int) touchY) + " -> to:" + ((int) posY));
-        animEndTool.startAnimEnd(touchY, posY);
-    }
-
-    /**
-     * 触摸移动中
-     *
-     * @param touchY
-     */
-    private void onMove(float touchY) {
-        //刷新
-        scrollY += (touchY - downY);
-        downY = touchY;
-        invalidate();
-    }
 
     /**
      * 选择监听
