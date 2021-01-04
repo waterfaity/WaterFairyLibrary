@@ -32,7 +32,7 @@ public class PickerView extends View {
     //当前位置
     private int currentPos = 0;
     //展示的数据个数
-    private int showDataSize = 5;
+    private int showDataSize = 3;
     //偏移量
     private int firstDataTransX;
     private int centerDataTransX;
@@ -54,9 +54,10 @@ public class PickerView extends View {
     private RectF diverLineY2;
 
     //第一个数据中心 y
+
     private int itemHeight = 50;
     private int halfItemHeight = itemHeight >> 1;
-    private int allHeight = 50;
+    private int allItemHeight = 50;
     //中心y
     private int centerX;
     private int centerY;
@@ -124,7 +125,7 @@ public class PickerView extends View {
         paint = new Paint();
         paint.setAntiAlias(true);
         dataList = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 10; i++) {
             dataList.add("数据数据数据数据" + i);
         }
         //飞滚
@@ -150,7 +151,7 @@ public class PickerView extends View {
                 //(((scrollY - oriScrollY) % allHeight + allHeight) / itemHeight)
                 //反向 去1 得当前下标
                 currentPos = dataList.size() - 1 -
-                        (((((scrollY - oriScrollY) % allHeight + allHeight)) % allHeight / itemHeight));
+                        (((((scrollY - oriScrollY) % allItemHeight + allItemHeight)) % allItemHeight / itemHeight));
                 if (onPickListener != null) onPickListener.onPick(currentPos);
 //                Log.i(TAG, "onAnimEnd: " + currentPos);
             }
@@ -184,7 +185,7 @@ public class PickerView extends View {
         centerY = (getHeight() >> 1);
         centerX = (getWidth() >> 1);
         halfItemHeight = itemHeight >> 1;
-        allHeight = dataList.size() * itemHeight;
+        allItemHeight = dataList.size() * itemHeight;
         chaneHeightRange = (showDataSize >> 1) * itemHeight;
         dTextSize = centerDataTextSize - firstDataTextSize;
         scrollY = oriScrollY = (int) ((getHeight() >> 1) + 0.5F * itemHeight);
@@ -201,7 +202,6 @@ public class PickerView extends View {
                 diverLineY2 = new RectF(diverLineY1.left, diverLineY1.top + itemHeight, diverLineY1.right, diverLineY1.bottom + itemHeight);
             }
         }
-
     }
 
     @Override
@@ -272,6 +272,8 @@ public class PickerView extends View {
         //中心线
         paint.setColor(Color.RED);
         canvas.drawLine(0, getHeight() >> 1, getWidth(), getHeight() >> 1, paint);
+
+        canvas.drawText(currentPos + "", 10, 100, paint);
     }
 
 
@@ -281,10 +283,9 @@ public class PickerView extends View {
     private void calcTextParams(Canvas canvas, int pos) {
 
         int currentY = pos * itemHeight + scrollY;
-        int totalHeight = dataList.size() * itemHeight;
 
         //求余  为负? otalHeight  :  0;
-        int currentStartY = (currentStartY = currentY % totalHeight) + (currentStartY < 0 ? totalHeight : 0);
+        int currentStartY = (currentStartY = currentY % allItemHeight) + (currentStartY < 0 ? allItemHeight : 0);
 
         //超出边界不绘制
         if (currentStartY < 0 || currentStartY - itemHeight - getHeight() > 0) return;
