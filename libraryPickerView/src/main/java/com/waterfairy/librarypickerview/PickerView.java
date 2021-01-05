@@ -140,7 +140,7 @@ public class PickerView extends View {
         paint = new Paint();
         paint.setAntiAlias(true);
         dataList = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 3; i++) {
             dataList.add("数据数据数据数据" + i);
         }
         //飞滚
@@ -225,9 +225,7 @@ public class PickerView extends View {
         scrollY = oriScrollY - currentPos * itemHeight;
         //x轴最大偏移距离
         dTransX = centerDataTransX - firstDataTransX;
-        Log.i(TAG, "initData: oriScrollY:" + oriScrollY);
-
-
+//        Log.i(TAG, "initData: oriScrollY:" + oriScrollY);
         if (showStyle == STYLE_CENTER) {
             //设置文本绘制样式
             paint.setTextAlign(Paint.Align.CENTER);
@@ -334,7 +332,7 @@ public class PickerView extends View {
 
         float posY = touchY - dY;
 
-        Log.i(TAG, "onUp: " + posY + " scrollY:" + scrollY + " targetY:" + (scrollY + dY));
+//        Log.i(TAG, "onUp: " + posY + " scrollY:" + scrollY + " targetY:" + (scrollY + dY));
 
         animEndTool.startAnimEnd(touchY, posY);
     }
