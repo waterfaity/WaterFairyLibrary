@@ -2,6 +2,8 @@
 <resources>
     <declare-styleable name="PickerView">
 
+        <!--        是否可以循环-->
+        <attr name="currentPos" format="integer" />
         <!--        展示数据数量-->
         <attr name="showDataSize" format="integer" />
         <!--        第一个数据偏移量-->
@@ -22,6 +24,8 @@
             <enum name="LEFT" value="1" />
             <enum name="RIGHT" value="2" />
         </attr>
+        <!--        是否可以飞滚-->
+        <attr name="flyingAble" format="boolean" />
         <!--        是否可以循环-->
         <attr name="loopAble" format="boolean" />
         <!--        高度间距-->

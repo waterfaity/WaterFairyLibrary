@@ -32,7 +32,7 @@ public class PickerView extends View {
     //当前位置
     private int currentPos = 0;
     //展示的数据个数
-    private int showDataSize = 3;
+    private int showDataSize = 5;
     //偏移量
     private int firstDataTransX;
     private int centerDataTransX;
@@ -42,6 +42,9 @@ public class PickerView extends View {
     //文本颜色
     private int firstDataTextColor = Color.CYAN;
     private int centerDataTextColor = Color.BLUE;
+
+    private boolean loopAble = true;
+    private boolean flyingAble = true;
 
     //分割线
     private int diverLineWidth;
@@ -69,10 +72,12 @@ public class PickerView extends View {
     private int dTransX;
 
 
-    //初始滚动X
-    private int oriScrollY;
+    //初始滚动X(非循环最大滚动Y)
+    private float oriScrollY;
+    //非循环 最小滚动y
+    private float oriMinScrollY;
     //滚动x
-    private int scrollY;
+    private float scrollY;
     //中间数据: 计算文本宽高数值
     private final Rect tempRect = new Rect();
     //按下y坐标
@@ -86,6 +91,13 @@ public class PickerView extends View {
     //手指松开  自动滚到到当前下标
     private final AnimEndTool animEndTool;
 
+    //触摸移动
+    private final int MOVE_TYPE_TOUCH = 0;
+    //飞滚
+    private final int MOVE_TYPE_FLYING = 1;
+    //移动到指定目标的动画
+    private final int MOVE_TYPE_ANIM = 2;
+
     private OnPickListener onPickListener;
 
     public PickerView(Context context) {
@@ -96,9 +108,12 @@ public class PickerView extends View {
     public PickerView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-
         if (attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.PickerView);
+
+            flyingAble = typedArray.getBoolean(R.styleable.PickerView_flyingAble, flyingAble);
+            loopAble = typedArray.getBoolean(R.styleable.PickerView_loopAble, loopAble);
+            currentPos = typedArray.getInt(R.styleable.PickerView_currentPos, currentPos);
 
             firstDataTextSize = typedArray.getDimensionPixelSize(R.styleable.PickerView_firstDataTextSize, firstDataTextSize);
             centerDataTextSize = typedArray.getDimensionPixelSize(R.styleable.PickerView_centerDataTextSize, centerDataTextSize);
@@ -125,18 +140,19 @@ public class PickerView extends View {
         paint = new Paint();
         paint.setAntiAlias(true);
         dataList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 20; i++) {
             dataList.add("数据数据数据数据" + i);
         }
         //飞滚
         gestureFlingTool = new GestureFlingTool(new GestureFlingTool.OnFlingListener() {
             @Override
             public void onFling(int x, int y, int dX, int dY) {
-                onMove(y);
+                onMove(MOVE_TYPE_FLYING, y);
             }
 
             @Override
             public void onFlingEnd(float x, float y) {
+
                 onUp(y);
             }
         });
@@ -144,21 +160,12 @@ public class PickerView extends View {
         animEndTool = new AnimEndTool(new AnimEndTool.OnAnimEndListener() {
             @Override
             public void onAnimEnd(float current) {
-                //根据偏移位置计算偏移下标
-                //偏移位置 取正
-                //(scrollY - oriScrollY) % allHeight + allHeight
-                //偏移数量
-                //(((scrollY - oriScrollY) % allHeight + allHeight) / itemHeight)
-                //反向 去1 得当前下标
-                currentPos = dataList.size() - 1 -
-                        (((((scrollY - oriScrollY) % allItemHeight + allItemHeight)) % allItemHeight / itemHeight));
-                if (onPickListener != null) onPickListener.onPick(currentPos);
-//                Log.i(TAG, "onAnimEnd: " + currentPos);
+                calcPos();
             }
 
             @Override
             public void onAnimUpdating(float current) {
-                onMove(current);
+                onMove(MOVE_TYPE_ANIM, current);
             }
         });
         //手势
@@ -169,6 +176,20 @@ public class PickerView extends View {
                 return true;
             }
         });
+    }
+
+    private void calcPos() {
+        //根据偏移位置计算偏移下标
+        //偏移位置 取正
+        //(scrollY - oriScrollY) % allHeight + allHeight
+        //偏移数量
+        //(((scrollY - oriScrollY) % allHeight + allHeight) / itemHeight)
+        //反向 去1 得当前下标
+        float tempPos = dataList.size() - 1 -
+                (((((scrollY - oriScrollY - itemHeight) % allItemHeight + allItemHeight)) % allItemHeight / itemHeight));
+        currentPos = Math.round(tempPos);
+        if (onPickListener != null) onPickListener.onPick(currentPos);
+//                Log.i(TAG, "onAnimEnd: " + currentPos);
     }
 
 
@@ -182,20 +203,36 @@ public class PickerView extends View {
      * 初始化数据
      */
     private void initData() {
-        centerY = (getHeight() >> 1);
-        centerX = (getWidth() >> 1);
+        //对下标处理
+        if (dataList.size() - 1 < currentPos) {
+            currentPos = dataList.size() - 1;
+        }
+        if (currentPos < 0) currentPos = 0;
+        //中心xy
+        centerY = getHeight() >> 1;
+        centerX = getWidth() >> 1;
+        //半个条目高度
         halfItemHeight = itemHeight >> 1;
+        //所有数据最高占用高度
         allItemHeight = dataList.size() * itemHeight;
+        //文本可改变的最大垂直距离
         chaneHeightRange = (showDataSize >> 1) * itemHeight;
+        //文本大小最大差距
         dTextSize = centerDataTextSize - firstDataTextSize;
-        scrollY = oriScrollY = (int) ((getHeight() >> 1) + 0.5F * itemHeight);
+        //y轴最初偏移距离
+        oriScrollY = (int) (centerY + 0.5F * itemHeight);
+        oriMinScrollY = oriScrollY - allItemHeight + itemHeight;
+        scrollY = oriScrollY - currentPos * itemHeight;
+        //x轴最大偏移距离
         dTransX = centerDataTransX - firstDataTransX;
         Log.i(TAG, "initData: oriScrollY:" + oriScrollY);
 
-        if (showStyle == STYLE_CENTER) {
-            paint.setTextAlign(Paint.Align.CENTER);
-            if (diverLineWidth != 0 && diverLineHeight != 0) {
 
+        if (showStyle == STYLE_CENTER) {
+            //设置文本绘制样式
+            paint.setTextAlign(Paint.Align.CENTER);
+            //指示线 两条
+            if (diverLineWidth != 0 && diverLineHeight != 0) {
                 float halfLineWidth = diverLineWidth >> 1;
                 float halfLineHeight = diverLineHeight >> 1;
                 diverLineY1 = new RectF(centerX - halfLineWidth, centerY - halfLineHeight - halfItemHeight, centerX + halfLineWidth, centerY + halfLineHeight - halfItemHeight);
@@ -204,17 +241,39 @@ public class PickerView extends View {
         }
     }
 
+
+    public int getCurrentPos() {
+        return currentPos;
+    }
+
+    public void setCurrentPos(int pos) {
+        //对下标处理
+        currentPos = pos;
+        if (dataList.size() - 1 < currentPos) {
+            currentPos = dataList.size() - 1;
+        }
+        if (currentPos < 0) currentPos = 0;
+        scrollY = oriScrollY - currentPos * itemHeight;
+        invalidate();
+        calcPos();
+    }
+
+    public void setDataList(List<Object> dataList) {
+        this.dataList = dataList;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            //手指按下, 停止
             gestureFlingTool.stop();
             animEndTool.stop();
         }
-        if (detector.onTouchEvent(event)) return true;
+        if (flyingAble && detector.onTouchEvent(event)) return true;
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             downY = event.getY();
         } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            onMove(event.getY());
+            onMove(MOVE_TYPE_TOUCH, event.getY());
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
             onUp(event.getY());
         }
@@ -225,29 +284,57 @@ public class PickerView extends View {
     /**
      * 触摸移动中
      *
+     * @param type
      * @param touchY
      */
-    private void onMove(float touchY) {
+    private void onMove(int type, float touchY) {
         //刷新
-        scrollY += (touchY - downY);
-        downY = touchY;
+        if (loopAble) {
+            scrollY += (touchY - downY);
+            downY = touchY;
+        } else {
+            //非循环 边界判断
+            float tempScrollY = (scrollY + (touchY - downY));
+            //是否超出边界
+            boolean isOverEdge;
+            if (isOverEdge = tempScrollY > oriScrollY) {
+                //上滚边界
+                scrollY = oriScrollY;
+            } else if (isOverEdge = tempScrollY < oriMinScrollY) {
+                //下滚边界
+                scrollY = oriMinScrollY;
+            } else {
+                //上下边界内
+                scrollY += (touchY - downY);
+                downY = touchY;
+            }
+            if (isOverEdge && type == MOVE_TYPE_FLYING) {
+                //超出边界 不再滚动
+                gestureFlingTool.stop();
+                calcPos();
+            }
+        }
         invalidate();
     }
 
 
     /**
-     * 触摸抬起
+     * 触摸抬起 计算附近的目标位置
      *
      * @param touchY
      */
     private void onUp(float touchY) {
-        scrollY += (touchY - downY);
+        scrollY += touchY - downY;
+        downY = touchY;
+
 
         float absHeight = ((scrollY - centerY) % itemHeight + itemHeight) % itemHeight;
 
         float dY = absHeight - halfItemHeight;
 
         float posY = touchY - dY;
+
+        Log.i(TAG, "onUp: " + posY + " scrollY:" + scrollY + " targetY:" + (scrollY + dY));
 
         animEndTool.startAnimEnd(touchY, posY);
     }
@@ -269,11 +356,11 @@ public class PickerView extends View {
             canvas.drawRoundRect(diverLineY2, diverLineRadius, diverLineRadius, paint);
         }
 
-        //中心线
-        paint.setColor(Color.RED);
-        canvas.drawLine(0, getHeight() >> 1, getWidth(), getHeight() >> 1, paint);
+//        //中心线
+//        paint.setColor(Color.RED);
+//        canvas.drawLine(0, centerY, getWidth(), centerY, paint);
 
-        canvas.drawText(currentPos + "", 10, 100, paint);
+//        canvas.drawText(currentPos + "", 10, 100, paint);
     }
 
 
@@ -282,10 +369,10 @@ public class PickerView extends View {
      */
     private void calcTextParams(Canvas canvas, int pos) {
 
-        int currentY = pos * itemHeight + scrollY;
-
-        //求余  为负? otalHeight  :  0;
-        int currentStartY = (currentStartY = currentY % allItemHeight) + (currentStartY < 0 ? allItemHeight : 0);
+        float currentStartY = pos * itemHeight + scrollY;
+        if (loopAble)
+            //求余  为负? otalHeight  :  0;
+            currentStartY = (currentStartY = currentStartY % allItemHeight) + (currentStartY < 0 ? allItemHeight : 0);
 
         //超出边界不绘制
         if (currentStartY < 0 || currentStartY - itemHeight - getHeight() > 0) return;
@@ -302,10 +389,10 @@ public class PickerView extends View {
      * @param y
      * @return
      */
-    private void drawText(Canvas canvas, int pos, int y) {
+    private void drawText(Canvas canvas, int pos, float y) {
 
         //距离中心位置 差距
-        int dHeight = y - halfItemHeight - centerY;
+        float dHeight = y - halfItemHeight - centerY;
 
         //在 界限之外的处理为在界限上
         if (dHeight < -chaneHeightRange || dHeight > chaneHeightRange) dHeight = chaneHeightRange;
@@ -314,7 +401,8 @@ public class PickerView extends View {
         float ratio = 1 - Math.abs(dHeight) / (float) chaneHeightRange;
 
         //计算此时的文本大小
-        float currentTextSize = firstDataTextSize + ratio * dTextSize;
+        float currentTextSize = Math.round(firstDataTextSize + ratio * dTextSize);
+
 
         //计算颜色
         int currentColor = firstDataTextColor;
@@ -326,17 +414,17 @@ public class PickerView extends View {
         paint.setTextSize(currentTextSize);
         paint.getTextBounds(text, 0, text.length(), tempRect);
         paint.setColor(currentColor);
-        if (pos == 0)
-            Log.i(TAG, "drawText: " + currentTextSize + "\t" + tempRect.width());
+//        if (pos == 0)
+//            Log.i(TAG, "drawText: " + currentTextSize + "\t" + tempRect.width());
 
         //当前y
-        int currentY = y - ((itemHeight - tempRect.height()) >> 1) - tempRect.bottom;
+        float currentY = Math.round(y - ((itemHeight - tempRect.height()) >> 1) - tempRect.bottom);
 
         //当前x
         int currentX = 0;
         if (showStyle == STYLE_CENTER) {
             //中心位置
-            currentX = getWidth() >> 1;
+            currentX = centerX;
         } else if (showStyle == STYLE_LEFT) {
             //左侧
             currentX = (int) (firstDataTransX + dTransX * ratio);
@@ -344,14 +432,16 @@ public class PickerView extends View {
             //右侧
             currentX = getWidth() - tempRect.width() - (int) (firstDataTransX + dTransX * ratio);
         }
+//        canvas.drawText(text + currentY + "-" + currentTextSize, currentX, currentY, paint);
+        canvas.drawText(text, Math.round(currentX), currentY, paint);
 
-        canvas.drawText(text, currentX, currentY, paint);
 
-        tempRect.bottom += currentY;
-        tempRect.top += currentY;
-        paint.setColor(Color.parseColor("#22000000"));
-        canvas.drawRect(tempRect, paint);
-        canvas.drawLine(0, y, getWidth(), y, paint);
+        //文本边框
+//        tempRect.bottom += currentY;
+//        tempRect.top += currentY;
+//        paint.setColor(Color.parseColor("#22000000"));
+//        canvas.drawRect(tempRect, paint);
+//        canvas.drawLine(0, y, getWidth(), y, paint);
     }
 
 
@@ -377,6 +467,9 @@ public class PickerView extends View {
         return Color.argb((int) (alpha + dAlpha * ratio), (int) (red + dRed * ratio), (int) (green + dGreen * ratio), (int) (blue + dBlue * ratio));
     }
 
+    public void setOnPickListener(OnPickListener onPickListener) {
+        this.onPickListener = onPickListener;
+    }
 
     /**
      * 选择监听

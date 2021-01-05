@@ -8,25 +8,29 @@
     tools:context=".MainActivity">
 
     <Button
+        android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="90dp" />
 
 
     <com.waterfairy.librarypickerview.PickerView
+        android:id="@+id/pick_view"
         android:layout_width="match_parent"
-        android:layout_height="326dp"
+        android:layout_height="160dp"
         android:layout_gravity="center"
         app:centerDataTextColor="#999912"
-        app:centerDataTextSize="40dp"
+        app:centerDataTextSize="22dp"
+        app:currentPos="1"
         app:diverLineColor="#991299"
-        app:diverLineHeight="6dp"
+        app:diverLineHeight="3dp"
         app:diverLineRadius="5dp"
-        app:diverLineWidth="80dp"
+        app:diverLineWidth="120dp"
         app:firstDataTextColor="#129999"
-        app:firstDataTextSize="20dp"
-        app:itemHeight="50dp"
+        app:firstDataTextSize="16dp"
+        app:flyingAble="true"
+        app:itemHeight="40dp"
         app:loopAble="true"
-        app:showDataSize="4"
+        app:showDataSize="5"
         app:showStyle="CENTER" />
 
 
