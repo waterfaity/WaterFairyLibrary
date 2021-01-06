@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -28,6 +29,7 @@ public class PickerView extends View {
     private static final String TAG = "pickerView";
     //展示样式  (0中间 1左侧 2右侧)
     private int showStyle;
+    private List<Object> oriDataList;
     private List<Object> dataList;
     //当前位置
     private int currentPos = 0;
@@ -43,7 +45,9 @@ public class PickerView extends View {
     private int firstDataTextColor = Color.CYAN;
     private int centerDataTextColor = Color.BLUE;
 
+    //循环
     private boolean loopAble = true;
+    //飞滚
     private boolean flyingAble = true;
 
     //分割线
@@ -55,8 +59,6 @@ public class PickerView extends View {
     private RectF diverLineY1;
     //分割线2
     private RectF diverLineY2;
-
-    //第一个数据中心 y
 
     private int itemHeight = 50;
     private int halfItemHeight = itemHeight >> 1;
@@ -70,8 +72,6 @@ public class PickerView extends View {
     private int dTextSize;
     //偏移 差值
     private int dTransX;
-
-
     //初始滚动X(非循环最大滚动Y)
     private float oriScrollY;
     //非循环 最小滚动y
@@ -92,13 +92,14 @@ public class PickerView extends View {
     private final AnimEndTool animEndTool;
 
     //触摸移动
-    private final int MOVE_TYPE_TOUCH = 0;
+    private final int MOVE_TYPE_ACTION_MOVE = 0;
     //飞滚
     private final int MOVE_TYPE_FLYING = 1;
     //移动到指定目标的动画
     private final int MOVE_TYPE_ANIM = 2;
 
     private OnPickListener onPickListener;
+    private Typeface typeFace;
 
     public PickerView(Context context) {
         this(context, null);
@@ -139,9 +140,9 @@ public class PickerView extends View {
 
         paint = new Paint();
         paint.setAntiAlias(true);
-        dataList = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
-            dataList.add("数据数据数据数据" + i);
+        oriDataList = new ArrayList<>();
+        for (int i = 0; i < 2; i++) {
+            oriDataList.add("item " + i);
         }
         //飞滚
         gestureFlingTool = new GestureFlingTool(new GestureFlingTool.OnFlingListener() {
@@ -152,7 +153,6 @@ public class PickerView extends View {
 
             @Override
             public void onFlingEnd(float x, float y) {
-
                 onUp(y);
             }
         });
@@ -187,9 +187,15 @@ public class PickerView extends View {
         //反向 去1 得当前下标
         float tempPos = dataList.size() - 1 -
                 (((((scrollY - oriScrollY - itemHeight) % allItemHeight + allItemHeight)) % allItemHeight / itemHeight));
-        currentPos = Math.round(tempPos);
+        currentPos = Math.round(tempPos < 0 ? 0 : tempPos) % oriDataList.size();
+        if (currentPos < 0) {
+            Log.e(TAG, "err: currentPos:" + currentPos + " scrollY:" + scrollY + " oriScrollY:" + oriScrollY + " itemHeight:" + itemHeight + " allItemHeight:" + allItemHeight + " dataList.size():" + dataList.size() + " oriDataList.size():" + oriDataList.size());
+            //小于0的异常
+            currentPos = 0;
+            scrollY = oriScrollY;
+            invalidate();
+        }
         if (onPickListener != null) onPickListener.onPick(currentPos);
-//                Log.i(TAG, "onAnimEnd: " + currentPos);
     }
 
 
@@ -203,11 +209,26 @@ public class PickerView extends View {
      * 初始化数据
      */
     private void initData() {
+
+        dataList = oriDataList;
+
+        if (loopAble && dataList.size() * itemHeight < getHeight()) {
+            int totalHeight = dataList.size() * itemHeight;
+            int times = getHeight() / totalHeight + (getHeight() % totalHeight == 0 ? 0 : 1);
+
+            dataList = new ArrayList<>();
+            for (int i = 0; i < times; i++) {
+                dataList.addAll(oriDataList);
+            }
+        }
+
         //对下标处理
         if (dataList.size() - 1 < currentPos) {
             currentPos = dataList.size() - 1;
         }
         if (currentPos < 0) currentPos = 0;
+        //最小展示数据2
+        if (showDataSize <= 1) showDataSize = 2;
         //中心xy
         centerY = getHeight() >> 1;
         centerX = getWidth() >> 1;
@@ -237,6 +258,9 @@ public class PickerView extends View {
                 diverLineY2 = new RectF(diverLineY1.left, diverLineY1.top + itemHeight, diverLineY1.right, diverLineY1.bottom + itemHeight);
             }
         }
+        if (typeFace != null)
+            paint.setTypeface(typeFace);
+        else paint.setTypeface(null);
     }
 
 
@@ -257,7 +281,137 @@ public class PickerView extends View {
     }
 
     public void setDataList(List<Object> dataList) {
+        setDataList(dataList, 0);
+    }
+
+    public void setDataList(List<Object> dataList, int currentPos) {
+        this.oriDataList = dataList;
         this.dataList = dataList;
+        this.currentPos = currentPos;
+    }
+
+    public int getShowStyle() {
+        return showStyle;
+    }
+
+    public void setShowStyle(int showStyle) {
+        this.showStyle = showStyle;
+    }
+
+    public int getShowDataSize() {
+        return showDataSize;
+    }
+
+    public void setShowDataSize(int showDataSize) {
+        this.showDataSize = showDataSize;
+    }
+
+    public int getFirstDataTransX() {
+        return firstDataTransX;
+    }
+
+    public void setFirstDataTransX(int firstDataTransX) {
+        this.firstDataTransX = firstDataTransX;
+    }
+
+    public int getCenterDataTransX() {
+        return centerDataTransX;
+    }
+
+    public void setCenterDataTransX(int centerDataTransX) {
+        this.centerDataTransX = centerDataTransX;
+    }
+
+    public int getFirstDataTextSize() {
+        return firstDataTextSize;
+    }
+
+    public void setFirstDataTextSize(int firstDataTextSize) {
+        this.firstDataTextSize = firstDataTextSize;
+    }
+
+    public int getCenterDataTextSize() {
+        return centerDataTextSize;
+    }
+
+    public void setCenterDataTextSize(int centerDataTextSize) {
+        this.centerDataTextSize = centerDataTextSize;
+    }
+
+    public int getFirstDataTextColor() {
+        return firstDataTextColor;
+    }
+
+    public void setFirstDataTextColor(int firstDataTextColor) {
+        this.firstDataTextColor = firstDataTextColor;
+    }
+
+    public int getCenterDataTextColor() {
+        return centerDataTextColor;
+    }
+
+    public void setCenterDataTextColor(int centerDataTextColor) {
+        this.centerDataTextColor = centerDataTextColor;
+    }
+
+    public boolean isLoopAble() {
+        return loopAble;
+    }
+
+    public void setLoopAble(boolean loopAble) {
+        this.loopAble = loopAble;
+    }
+
+    public boolean isFlyingAble() {
+        return flyingAble;
+    }
+
+    public void setFlyingAble(boolean flyingAble) {
+        this.flyingAble = flyingAble;
+    }
+
+    public int getDiverLineWidth() {
+        return diverLineWidth;
+    }
+
+    public void setDiverLineWidth(int diverLineWidth) {
+        this.diverLineWidth = diverLineWidth;
+    }
+
+    public int getDiverLineHeight() {
+        return diverLineHeight;
+    }
+
+    public void setDiverLineHeight(int diverLineHeight) {
+        this.diverLineHeight = diverLineHeight;
+    }
+
+    public int getDiverLineRadius() {
+        return diverLineRadius;
+    }
+
+    public void setDiverLineRadius(int diverLineRadius) {
+        this.diverLineRadius = diverLineRadius;
+    }
+
+    public int getDiverLineColor() {
+        return diverLineColor;
+    }
+
+    public void setDiverLineColor(int diverLineColor) {
+        this.diverLineColor = diverLineColor;
+    }
+
+    public int getItemHeight() {
+        return itemHeight;
+    }
+
+    public void setItemHeight(int itemHeight) {
+        this.itemHeight = itemHeight;
+    }
+
+    public OnPickListener getOnPickListener() {
+        return onPickListener;
     }
 
     @Override
@@ -271,7 +425,7 @@ public class PickerView extends View {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             downY = event.getY();
         } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-            onMove(MOVE_TYPE_TOUCH, event.getY());
+            onMove(MOVE_TYPE_ACTION_MOVE, event.getY());
         } else if (event.getAction() == MotionEvent.ACTION_UP) {
             onUp(event.getY());
         }
@@ -467,6 +621,14 @@ public class PickerView extends View {
 
     public void setOnPickListener(OnPickListener onPickListener) {
         this.onPickListener = onPickListener;
+    }
+
+    public void setTypeFace(Typeface typeFace) {
+        this.typeFace = typeFace;
+    }
+
+    public Typeface getTypeFace() {
+        return typeFace;
     }
 
     /**

@@ -16,8 +16,9 @@
     <com.waterfairy.librarypickerview.PickerView
         android:id="@+id/pick_view"
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="300dp"
         android:layout_gravity="center"
+        android:background="#11000000"
         app:centerDataTextColor="#999912"
         app:centerDataTextSize="22dp"
         app:currentPos="1"
@@ -27,10 +28,10 @@
         app:diverLineWidth="120dp"
         app:firstDataTextColor="#129999"
         app:firstDataTextSize="16dp"
-        app:flyingAble="false"
+        app:flyingAble="true"
         app:itemHeight="40dp"
-        app:loopAble="false"
-        app:showDataSize="5"
+        app:loopAble="true"
+        app:showDataSize="1"
         app:showStyle="CENTER" />
 
 
