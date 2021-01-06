@@ -6,10 +6,10 @@ import android.view.MotionEvent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 /**
- * @author water_fairy
+ * @author water_fairy / xuchangwei
  * @email 995637517@qq.com
  * @date 2019-08-25 16:57
- * @info:
+ * @info: 松开手指 飞滚处理
  */
 public class GestureFlingTool {
     private OnFlingListener onFlingListener;

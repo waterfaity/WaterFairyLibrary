@@ -17,10 +17,12 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
- * user:xuchangwei
- * time:2020/12/31
- * info:
+ * @author water_fairy / xuchangwei
+ * @email 995637517@qq.com
+ * @date 2021-01-01 16:57
+ * @info: 选择器
  */
 public class PickerView extends View {
     public static final int STYLE_CENTER = 0;

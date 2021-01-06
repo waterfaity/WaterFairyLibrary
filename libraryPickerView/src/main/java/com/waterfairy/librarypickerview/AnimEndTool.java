@@ -5,10 +5,10 @@ import android.animation.ValueAnimator;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 /**
- * @author water_fairy
+ * @author water_fairy / xuchangwei
  * @email 995637517@qq.com
  * @date 2019-08-25 16:57
- * @info:
+ * @info: 数值过度器:   x1 -> x2
  */
 public class AnimEndTool {
     private OnAnimEndListener onAnimEndListener;
@@ -16,7 +16,7 @@ public class AnimEndTool {
     private MyValueAnimator valueAnimator;
 
     public AnimEndTool(OnAnimEndListener onAnimEndListener) {
-        this.onAnimEndListener=onAnimEndListener;
+        this.onAnimEndListener = onAnimEndListener;
     }
 
     public void setOnAnimEndListener(OnAnimEndListener onAnimEndListener) {
