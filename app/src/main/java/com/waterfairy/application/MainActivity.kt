@@ -14,10 +14,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        pick_view.setOnPickListener { button.text = it.toString() }
+        pick_view.setOnPickListener { pickrView, any, pos -> button.text = any.toString() }
         button.setOnClickListener { view -> pick_view.currentPos = 10 }
 
     }
-
-
 }

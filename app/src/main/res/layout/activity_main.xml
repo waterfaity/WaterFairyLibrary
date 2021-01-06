@@ -23,7 +23,7 @@
         app:centerDataTextSize="22dp"
         app:currentPos="1"
         app:diverLineColor="#991299"
-        app:diverLineHeight="3dp"
+        app:diverLineHeight="1px"
         app:diverLineRadius="5dp"
         app:diverLineWidth="120dp"
         app:firstDataTextColor="#129999"

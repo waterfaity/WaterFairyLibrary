@@ -35,6 +35,7 @@ public class PickerView extends View {
     private int currentPos = 0;
     //展示的数据个数
     private int showDataSize = 5;
+
     //偏移量
     private int firstDataTransX;
     private int centerDataTransX;
@@ -55,6 +56,7 @@ public class PickerView extends View {
     private int diverLineHeight;
     private int diverLineRadius;
     private int diverLineColor;
+    private int diverLineTransY;
     //分割线1
     private RectF diverLineY1;
     //分割线2
@@ -134,6 +136,7 @@ public class PickerView extends View {
             diverLineHeight = typedArray.getDimensionPixelSize(R.styleable.PickerView_diverLineHeight, diverLineHeight);
             diverLineRadius = typedArray.getDimensionPixelSize(R.styleable.PickerView_diverLineRadius, diverLineRadius);
             diverLineColor = typedArray.getColor(R.styleable.PickerView_diverLineColor, diverLineColor);
+            diverLineTransY = typedArray.getDimensionPixelSize(R.styleable.PickerView_diverLineTransY, diverLineTransY);
 
             typedArray.recycle();
         }
@@ -141,7 +144,7 @@ public class PickerView extends View {
         paint = new Paint();
         paint.setAntiAlias(true);
         oriDataList = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 5; i++) {
             oriDataList.add("item " + i);
         }
         //飞滚
@@ -195,7 +198,8 @@ public class PickerView extends View {
             scrollY = oriScrollY;
             invalidate();
         }
-        if (onPickListener != null) onPickListener.onPick(currentPos);
+        if (onPickListener != null)
+            onPickListener.onPick(this, oriDataList.get(currentPos), currentPos);
     }
 
 
@@ -254,8 +258,8 @@ public class PickerView extends View {
             if (diverLineWidth != 0 && diverLineHeight != 0) {
                 float halfLineWidth = diverLineWidth >> 1;
                 float halfLineHeight = diverLineHeight >> 1;
-                diverLineY1 = new RectF(centerX - halfLineWidth, centerY - halfLineHeight - halfItemHeight, centerX + halfLineWidth, centerY + halfLineHeight - halfItemHeight);
-                diverLineY2 = new RectF(diverLineY1.left, diverLineY1.top + itemHeight, diverLineY1.right, diverLineY1.bottom + itemHeight);
+                diverLineY1 = new RectF(centerX - halfLineWidth, centerY - halfLineHeight - halfItemHeight + diverLineTransY, centerX + halfLineWidth, centerY + halfLineHeight - halfItemHeight + diverLineTransY);
+                diverLineY2 = new RectF(diverLineY1.left, centerY - halfLineHeight + halfItemHeight - diverLineTransY, diverLineY1.right, centerY + halfLineHeight + halfItemHeight - diverLineTransY);
             }
         }
         if (typeFace != null)
@@ -284,10 +288,20 @@ public class PickerView extends View {
         setDataList(dataList, 0);
     }
 
+    public void setStringDataList(List<String> dataList) {
+        setStringDataList(new ArrayList<>(dataList), 0);
+    }
+
+    public void setStringDataList(List<String> dataList, int currentPos) {
+        setDataList(new ArrayList<>(dataList), currentPos);
+    }
+
     public void setDataList(List<Object> dataList, int currentPos) {
         this.oriDataList = dataList;
         this.dataList = dataList;
         this.currentPos = currentPos;
+        initData();
+        invalidate();
     }
 
     public int getShowStyle() {
@@ -504,8 +518,13 @@ public class PickerView extends View {
 
         if (diverLineY1 != null) {
             paint.setColor(diverLineColor);
-            canvas.drawRoundRect(diverLineY1, diverLineRadius, diverLineRadius, paint);
-            canvas.drawRoundRect(diverLineY2, diverLineRadius, diverLineRadius, paint);
+            if (diverLineY1.height() == 0) {
+                canvas.drawLine(diverLineY1.left, diverLineY1.top, diverLineY1.right, diverLineY1.top, paint);
+                canvas.drawLine(diverLineY2.left, diverLineY2.top, diverLineY2.right, diverLineY2.top, paint);
+            } else {
+                canvas.drawRoundRect(diverLineY1, diverLineRadius, diverLineRadius, paint);
+                canvas.drawRoundRect(diverLineY2, diverLineRadius, diverLineRadius, paint);
+            }
         }
 
 //        //中心线
@@ -596,6 +615,9 @@ public class PickerView extends View {
 //        canvas.drawLine(0, y, getWidth(), y, paint);
     }
 
+    public List<Object> getDataList() {
+        return oriDataList;
+    }
 
     /**
      * 颜色过度
@@ -631,10 +653,23 @@ public class PickerView extends View {
         return typeFace;
     }
 
+    public Object getSelectObject() {
+        if (oriDataList != null && currentPos >= 0 && currentPos < dataList.size()) {
+            return oriDataList.get(currentPos);
+        }
+        return null;
+    }
+
+    public String getSelectString() {
+        Object selectObject = getSelectObject();
+        if (selectObject == null) return "";
+        else return selectObject.toString();
+    }
+
     /**
      * 选择监听
      */
     public interface OnPickListener {
-        void onPick(int pos);
+        void onPick(PickerView pickerView, Object object, int pos);
     }
 }
