@@ -418,6 +418,14 @@ public class PickerView extends View {
         this.diverLineColor = diverLineColor;
     }
 
+    public int getDiverLineTransY() {
+        return diverLineTransY;
+    }
+
+    public void setDiverLineTransY(int diverLineTransY) {
+        this.diverLineTransY = diverLineTransY;
+    }
+
     public int getItemHeight() {
         return itemHeight;
     }

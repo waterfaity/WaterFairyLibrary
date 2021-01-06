@@ -25,6 +25,7 @@
         app:diverLineColor="#991299"
         app:diverLineHeight="1px"
         app:diverLineRadius="5dp"
+        app:diverLineTransY="-6px"
         app:diverLineWidth="120dp"
         app:firstDataTextColor="#129999"
         app:firstDataTextSize="16dp"
