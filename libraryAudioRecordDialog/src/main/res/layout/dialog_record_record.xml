@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true"
+        android:background="#FFFFFF">
+
+        <TextView
+            android:id="@+id/tv_noti"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/iv_record"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:hint="建议录音长度不超过10分钟"
+            android:text="建议录音长度不超过10分钟"
+            android:textColor="#222222"
+            android:textSize="12dp" />
+
+        <ImageView
+            android:id="@+id/iv_record"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/record_dialog_click_style_bg_trans"
+            android:src="@drawable/record_dialog_bg_record_normal" />
+
+        <LinearLayout
+            android:id="@+id/rel_select_audio"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="40dp"
+            android:layout_toRightOf="@+id/iv_record"
+            android:background="@drawable/record_dialog_click_style_bg_trans"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/record_dialog_icon_add_2"
+                android:tint="#A1A1AA" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="选择音频"
+                android:textColor="#A1A1AA"
+                android:textSize="12dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_record"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/iv_record"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="20dp"
+            android:text="点击开始录音"
+            android:textColor="#111111"
+            android:textSize="14dp" />
+
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--自定义dialog style -->
+    <style name="recordDialogSelf" parent="Base.Theme.AppCompat.Dialog">
+        <item name="colorPrimaryDark">@android:color/transparent</item>
+        <!--是否有边框 -->
+        <item name="android:windowFrame">@null</item>
+        <!--是否有actionBar-->
+        <item name="android:windowNoTitle">true</item>
+        <!--默认背景白色,切圆角-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--默认true,是否浮起 ,布局居中-->
+        <item name="android:windowIsFloating">false</item>
+        <!--是否有覆盖,启动时 会有黑白屏的现象,以此解决-->
+        <item name="android:windowContentOverlay">@null</item>
+        <!--是否有背景阴影-->
+        <item name="android:backgroundDimEnabled">true</item>
+        <!--&lt;!&ndash;全屏 ,会屏蔽状态栏&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:windowFullscreen">true</item>&ndash;&gt;-->
+    </style>
+
+    <!--默认-->
+    <style name="recordBaseDialog" parent="Base.Theme.AppCompat.Dialog" />
+
+    <!--透明-->
+    <style name="dialogTransBg" parent="recordDialogSelf">
+        <!--是否有背景阴影-->
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+
+</resources>

@@ -6,6 +6,7 @@ import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import com.waterfairy.libraryaudiorecorddialog.RecordDialog
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
@@ -16,6 +17,8 @@ class MainActivity : AppCompatActivity() {
 
         pick_view.setOnPickListener { pickrView, any, pos -> button.text = any.toString() }
         button.setOnClickListener { view -> pick_view.currentPos = 10 }
+
+        RecordDialog(this, true).show()
 
     }
 }

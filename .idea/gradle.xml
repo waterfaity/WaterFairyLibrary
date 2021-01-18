@@ -14,6 +14,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/libraryAudioPlay" />
             <option value="$PROJECT_DIR$/libraryAudioRecord" />
+            <option value="$PROJECT_DIR$/libraryAudioRecordDialog" />
             <option value="$PROJECT_DIR$/libraryDateTimePicker" />
             <option value="$PROJECT_DIR$/libraryDownloader" />
             <option value="$PROJECT_DIR$/libraryExoPlayer" />

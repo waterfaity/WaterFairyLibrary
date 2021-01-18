@@ -1,3 +1,4 @@
+include ':libraryAudioRecordDialog'
 include ':libraryPickerView'
 include ':app'
 rootProject.name = "WaterFairyLibrary"
