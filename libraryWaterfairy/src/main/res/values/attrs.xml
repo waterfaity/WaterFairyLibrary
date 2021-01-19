@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="BubbleRelativeLayout">
+        <attr name="bubbleRightMargin" format="dimension" />
+        <attr name="bubbleRadius" format="dimension" />
+        <attr name="bubbleTriangleWidth" format="dimension" />
+        <attr name="bubbleTriangleHeight" format="dimension" />
+        <attr name="bubbleBGColor" format="color" />
+        <attr name="bubbleCenter" format="boolean" />
+    </declare-styleable>
+</resources>

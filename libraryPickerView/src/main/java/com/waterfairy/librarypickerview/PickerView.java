@@ -147,7 +147,7 @@ public class PickerView extends View {
         paint.setAntiAlias(true);
         oriDataList = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
-            oriDataList.add("item " + i);
+            oriDataList.add("" + i);
         }
         //飞滚
         gestureFlingTool = new GestureFlingTool(new GestureFlingTool.OnFlingListener() {

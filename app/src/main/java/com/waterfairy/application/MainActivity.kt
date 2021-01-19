@@ -18,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         pick_view.setOnPickListener { pickrView, any, pos -> button.text = any.toString() }
         button.setOnClickListener { view -> pick_view.currentPos = 10 }
 
-        RecordDialog(this, true).show()
+
 
     }
 }
